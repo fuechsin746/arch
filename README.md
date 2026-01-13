@@ -1,41 +1,90 @@
-# Arch Linux on Dell 15 (dc15255)
+💻 Modular Arch Linux Installer (Laptop Edition)
 
-Automated Arch Linux installation script optimized for the **AMD Ryzen 3 7320u** (Mendocino) with Radeon 610M graphics. This setup focuses on system stability via Btrfs snapshots, XDG Base Directory compliance, and a lean Zsh environment.
+This repository contains a two-stage automated installation process for Arch Linux, optimized for AMD Laptops with NVMe storage, Btrfs snapshots, and a Hyprland desktop environment.
+🏗️ Architecture Overview
 
-## 💻 Hardware Specs
-- **Model:** Dell 15 dc15255
-- **CPU:** AMD Ryzen 3 7320u
-- **RAM:** 8 GiB
-- **Disk:** 512 GB NVMe (`/dev/nvme0n1`)
+The installation is split into two modules to ensure system stability and customizability:
 
-## 🛠️ System Architecture
+    Stage 1: Base Install (base_install.py)
 
-### Partitioning & Subvolumes
-The disk is partitioned using GPT with a focus on Btrfs subvolumes to allow for atomic system rollbacks without affecting user data or system logs.
+        Disk: Automatic NVMe detection and partitioning.
 
+        Filesystem: Btrfs with subvolumes (@, @home, @log, @pkg, @snapshots).
 
+        Drivers: AMDGPU, Multi-filesystem support (NTFS, XFS, F2FS), and Libinput for trackpads.
 
-| Partition | Size | Format | Mount Point | Subvolume |
-| :--- | :--- | :--- | :--- | :--- |
-| `nvme0n1p1` | 1 GiB | FAT32 | `/boot` | — |
-| `nvme0n1p2` | 8 GiB | Swap | `[SWAP]` | — |
-| `nvme0n1p3` | 467 GiB| Btrfs | `/` | `@` |
-| `nvme0n1p3` | — | Btrfs | `/home` | `@home` |
-| `nvme0n1p3` | — | Btrfs | `/.snapshots`| `@snapshots` |
-| `nvme0n1p3` | — | Btrfs | `/var/log` | `@log` |
-| `nvme0n1p3` | — | Btrfs | `/var/cache`| `@pkg` |
+        Boot: GRUB with os-prober for dual-booting and grub-btrfs for snapshot booting.
 
-### Key Features
-- **Snapshots:** `Snapper` configured with `grub-btrfs` for bootable snapshots directly from the GRUB menu.
-- **AMD Optimization:** Includes `amd-ucode`, `mesa`, and `amdgpu` kernel modules.
-- **Memory:** Hybrid 8 GiB Physical Swap + ZRAM (Half of RAM) using `zram-generator`.
-- **XDG Compliance:** All Zsh configs and history are moved out of the home root to `~/.config`, `~/.cache`, and `~/.local`.
-- **Init:** Modern `systemd` hooks in `mkinitcpio.conf`.
+    Stage 2: Desktop & AUR (setup_gui.py)
 
-## 🚀 Deployment
-1. Boot the Arch ISO.
-2. Connect to the internet (use `iwctl` for WiFi).
-3. Run the installer directly from this repo:
-   ```bash
-   curl -L https://raw.githubusercontent.com/fuechsin746/arch/main/install.py -o install.py
-   python install.py
+        TUI Menu: Choose between GNOME, KDE, or Hyprland.
+
+        Wayland Stack: Hyprland managed via UWSM for robust session handling.
+
+        Laptop Tweaks: SDDM HiDPI scaling, Tap-to-click, and Battery optimization (power-profiles-daemon).
+
+        AUR: Automated installation of yay and common productivity apps.
+
+🚀 Installation Instructions
+1. Preparation
+
+Boot into the Arch Linux Live ISO and connect to the internet:
+Bash
+
+iwctl
+# Connect to your WiFi
+ping google.com
+
+2. Execute Base Installation
+
+Download and run the first script to prepare the hardware:
+Bash
+
+curl -O https://raw.githubusercontent.com/your-username/your-repo/main/base_install.py
+python base_install.py
+
+Follow the TUI prompts for Hostname, Username, and Password.
+3. First Reboot
+
+Remove the USB drive and reboot into the new system. Log in with your user credentials.
+4. Execute GUI Setup
+
+Run the second script to install the desktop environment and apps:
+Bash
+
+curl -O https://raw.githubusercontent.com/your-username/your-repo/main/setup_gui.py
+python setup_gui.py
+
+Select Hyprland in the menu to trigger the UWSM/SDDM configuration.
+🛡️ Recovery & Maintenance
+Snapshot Rollback
+
+If a system update or configuration change breaks your GUI:
+
+    Reboot the laptop.
+
+    In the GRUB Menu, select "Arch Linux snapshots".
+
+    Select a snapshot from before the break.
+
+    Once booted, run: snapper rollback to make the snapshot permanent.
+
+Power Management
+
+Use the following command to toggle battery modes on the fly:
+Bash
+
+powerprofilesctl set power-saver  # Best for battery
+powerprofilesctl set performance   # Best for gaming/coding
+
+⌨️ Hyprland Cheat Sheet
+
+    Terminal: Super + Q
+
+    Launcher: Super + R
+
+    Kill App: Super + C
+
+    Logout: Super + M
+
+    Floating: Super + V
