@@ -37,5 +37,5 @@ The disk is partitioned using GPT with a focus on Btrfs subvolumes to allow for 
 2. Connect to the internet (use `iwctl` for WiFi).
 3. Run the installer directly from this repo:
    ```bash
-   curl -L [https://raw.githubusercontent.com/fuechsin746/arch/main/install.py](https://raw.githubusercontent.com/fuechsin746/arch/main/install.py) -o install.py
+   curl -L https://raw.githubusercontent.com/fuechsin746/arch/main/install.py -o install.py
    python install.py
